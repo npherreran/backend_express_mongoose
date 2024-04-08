@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
 
 const User = require('./model/user')
+const auth = require('./middleware/auth')
 
 const app = express() 
 app.use(express.json())
@@ -23,7 +24,9 @@ app.post("/register", async (req, res) => {
     
         const existingUser = await User.findOne({email})
         
-        if (existingUser) res.status(401).send("User already exists")
+        if (existingUser) {
+            return res.status(401).send("User already exists")
+        }
     
         const myEncPassword = await bcrypt.hash(password, 10)
     
@@ -60,12 +63,11 @@ app.post("/login", async (req, res) => {
         const {email, password} = req.body
 
         if(!(email && password)) {
-            res.status(400).send("Field is missing")
+            return res.status(400).send("Field is missing")
         }
 
         const user = await User.findOne({email})
 
-        // if (!user) res.status(400).send("You are not registered in our app")
         if (user && (await bcrypt.compare(password, user.password))) {
             const token = jwt.sign(
                 {user_id: user._id, email},
@@ -85,5 +87,9 @@ app.post("/login", async (req, res) => {
         console.log(error);
     }
 })
+
+app.get("/dashboard", auth, (req, res) => {
+    res.send("welcome to secret information")
+}) 
 
 module.exports = app
