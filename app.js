@@ -3,12 +3,13 @@ require("./config/database").connect()
 const express = require("express")
 const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
-
+var cookieParser = require('cookie-parser')
 const User = require('./model/user')
 const auth = require('./middleware/auth')
 
 const app = express() 
 app.use(express.json())
+app.use(cookieParser())
 
 app.get("/", (req, res) => {
     res.send("<h1>Hola desde auth system</h1>")
@@ -79,7 +80,20 @@ app.post("/login", async (req, res) => {
 
             user.token = token
             user.password = undefined
-            res.status(200).send(user)
+            // res.status(200).send(user)
+
+            // ifyou want to use cookies
+                const options = {
+                    expires: new Date(
+                        Date.now() + 3 * 24 * 60 * 60 * 1000
+                    ),
+                    httpOnly: true,
+                }
+
+                return res.status(200).cookie('token', token, options).json({
+                    success: true,
+                    token
+                })
         }
         res.status(400).send("email or password is incorrect")
         

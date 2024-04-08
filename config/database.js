@@ -8,7 +8,7 @@ exports.connect = () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })
-        .then(console.log(`CONNECTION SUCCESFULLY`))
+        .then(console.log(`❤ 🎀 DB CONNECTION SUCCESFULLY 🎀 ❤`))
         .catch(error => {
             console.log(`DB CONNECTION FAILED`)
             console.log(error)
